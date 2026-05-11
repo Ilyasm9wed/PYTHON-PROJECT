@@ -1,0 +1,187 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Accueil - LocaPart Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="min-vh-100 d-flex align-items-center position-relative overflow-hidden text-center" style="margin-top: -1.5rem;">
+  <div class="bg-gradient-blob animate-float" style="width: 500px; height: 500px; background: rgba(124, 58, 237, 0.2); top: -10%; left: -10%;"></div>
+  <div class="bg-gradient-blob animate-float" style="width: 600px; height: 600px; background: rgba(37, 99, 235, 0.2); bottom: -10%; right: -10%; animation-delay: 2s;"></div>
+
+  <div class="container position-relative z-1 animate-fade-in-up">
+    <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill card border-primary mb-4" style="background: rgba(255,255,255,0.05);">
+      <span class="fs-5">🚀</span>
+      <span class="small fw-semibold text-light">Next-Gen Booking Platform 2026</span>
+    </div>
+    
+    <h1 class="display-3 fw-bold mb-4" style="font-family: 'Poppins', sans-serif;">
+      Trouvez votre logement <span class="text-gradient">Idéal</span>
+    </h1>
+    
+    <p class="lead text-secondary mx-auto mb-5" style="max-width: 600px;">
+      Location entre particuliers de confiance. Des milliers de logements disponibles dans tout le Maroc avec des réservations et paiements sécurisés.
+    </p>
+
+    <!-- Search Form inside Hero -->
+    <div class="card p-4 mx-auto mb-5" style="max-width: 800px;">
+      <form method="get" action="{% url 'property_list' %}" class="row g-3 align-items-end">
+        <div class="col-md-4 text-start">
+          <label class="form-label small text-secondary">Localisation</label>
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-secondary text-secondary"><i class="fa-solid fa-location-dot"></i></span>
+            <input type="text" name="location" class="form-control border-start-0" placeholder="Où allez-vous ?">
+          </div>
+        </div>
+        <div class="col-md-4 text-start">
+          <label class="form-label small text-secondary">Catégorie</label>
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-secondary text-secondary"><i class="fa-solid fa-list"></i></span>
+            <select name="category" class="form-select border-start-0">
+              <option value="">Toutes catégories</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary w-100 py-2">
+            <i class="fa-solid fa-magnifying-glass me-2"></i>Rechercher
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 position-relative z-1">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100 p-4">
+          <div class="fs-1 mb-3">🏠</div>
+          <h3 class="fw-bold text-gradient mb-1">5,000+</h3>
+          <p class="small text-secondary mb-0">Logements Actifs</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100 p-4">
+          <div class="fs-1 mb-3">🎯</div>
+          <h3 class="fw-bold text-gradient mb-1">10,000+</h3>
+          <p class="small text-secondary mb-0">Clients Satisfaits</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100 p-4">
+          <div class="fs-1 mb-3">🛡️</div>
+          <h3 class="fw-bold text-gradient mb-1">100%</h3>
+          <p class="small text-secondary mb-0">Paiements Sécurisés</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100 p-4">
+          <div class="fs-1 mb-3">🌍</div>
+          <h3 class="fw-bold text-gradient mb-1">24/7</h3>
+          <p class="small text-secondary mb-0">Support Dédié</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Properties Section -->
+<section class="py-5 position-relative z-1">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-gradient mb-3">Dernières Annonces</h2>
+      <p class="text-secondary">Découvrez nos logements les plus récents et populaires.</p>
+    </div>
+
+    <div class="row g-4">
+      {% for property in latest_properties %}
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 border-0 p-3">
+          <div class="rounded overflow-hidden mb-3 position-relative" style="height: 200px;">
+            {% if property.image %}
+            <img src="{{ property.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ property.titre }}">
+            {% else %}
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.1);">
+              <i class="fa-solid fa-image text-secondary fs-1"></i>
+            </div>
+            {% endif %}
+            <div class="position-absolute top-0 end-0 m-2">
+              <span class="badge" style="background: var(--neon-indigo);">{{ property.nom_reference_categorie|default:"Logement" }}</span>
+            </div>
+          </div>
+          
+          <div class="d-flex flex-column h-100">
+            <h5 class="card-title fs-5 mb-2">{{ property.titre }}</h5>
+            <p class="small text-secondary mb-3"><i class="fa-solid fa-location-dot me-1"></i> {{ property.localisation }}</p>
+            
+            <div class="mt-auto pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+              <div>
+                <span class="fw-bold text-white fs-5">{{ property.prix_jour }}</span>
+                <span class="small text-secondary">MAD/j</span>
+              </div>
+              <a href="{% url 'property_detail' property.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">Détails</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center">
+        <div class="card p-5">
+          <p class="text-secondary mb-0">Aucune annonce disponible pour le moment.</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <div class="text-center mt-5">
+      <a href="{% url 'property_list' %}" class="btn btn-secondary px-4 py-2">Voir toutes les annonces</a>
+    </div>
+  </div>
+</section>
+
+<!-- How it Works Section -->
+<section class="py-5 position-relative z-1 mt-4">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-gradient mb-3">Comment ça marche ?</h2>
+      <p class="text-secondary">Votre séjour en trois étapes simples.</p>
+    </div>
+    
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="card p-4 h-100 border-0">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 mx-auto" style="width: 80px; height: 80px; background: rgba(124, 58, 237, 0.2); border: 2px solid var(--neon-purple);">
+            <i class="fa-solid fa-magnifying-glass fs-3 text-white"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-3">1. Recherchez</h4>
+          <p class="text-secondary">Trouvez le logement parfait parmi des milliers d'annonces vérifiées.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 h-100 border-0">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 mx-auto" style="width: 80px; height: 80px; background: rgba(37, 99, 235, 0.2); border: 2px solid var(--neon-blue);">
+            <i class="fa-solid fa-calendar-check fs-3 text-white"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-3">2. Réservez</h4>
+          <p class="text-secondary">Réservez en toute sécurité avec notre système de paiement protégé.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 h-100 border-0">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 mx-auto" style="width: 80px; height: 80px; background: rgba(99, 102, 241, 0.2); border: 2px solid var(--neon-indigo);">
+            <i class="fa-solid fa-house-chimney fs-3 text-white"></i>
+          </div>
+          <h4 class="text-white fw-bold mb-3">3. Profitez</h4>
+          <p class="text-secondary">Profitez de votre séjour et laissez un avis pour aider la communauté.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

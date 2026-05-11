@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5>Conversation</h5>
+      </div>
+      <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+        {% for message in messages %}
+        <div class="mb-3 {% if message.expediteur == user %}text-end{% else %}text-start{% endif %}">
+          <div class="d-inline-block {% if message.expediteur == user %}bg-primary text-white{% else %}bg-light{% endif %} p-3 rounded" style="max-width: 70%;">
+            <p class="mb-1">{{ message.contenu }}</p>
+            <small class="{% if message.expediteur == user %}text-white-50{% else %}text-muted{% endif %}">
+              {{ message.date|date:"d/m/Y H:i" }}
+              {% if message.expediteur != user and not message.lu %}
+              <span class="badge bg-secondary">Nouveau</span>
+              {% endif %}
+            </small>
+          </div>
+        </div>
+        {% empty %}
+        <p>Aucun message.</p>
+        {% endfor %}
+      </div>
+      <div class="card-footer">
+        <form method="post">
+          {% csrf_token %}
+          <div class="input-group">
+            <input type="text" name="contenu" class="form-control" placeholder="Écrivez votre message..." required>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Participants</h5>
+      </div>
+      <div class="card-body">
+        {% for participant in conversation.participants.all %}
+        <p>{{ participant.username }}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Signaler une annonce{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Signaler une annonce</h1>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Raison</label>
+    <select name="raison" class="form-select" required>
+      <option value="spam">Spam</option>
+      <option value="fake">Fausse annonce</option>
+      <option value="inappropriate">Contenu inapproprié</option>
+      <option value="other">Autre</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="4" required></textarea>
+  </div>
+  <button type="submit" class="btn btn-danger">Envoyer le signalement</button>
+  <a href="{% url 'property_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

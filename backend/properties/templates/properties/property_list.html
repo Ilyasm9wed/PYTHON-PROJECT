@@ -1,0 +1,76 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Annonces - Location Entre Particuliers{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Toutes les annonces</h1>
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h5>Filtres</h5>
+      <form method="get">
+        <div class="mb-3">
+          <label class="form-label">Recherche</label>
+          <input type="text" name="q" class="form-control" value="{{ request.GET.q }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Catégorie</label>
+          <select name="category" class="form-select">
+            <option value="">Toutes</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Localisation</label>
+          <input type="text" name="location" class="form-control" value="{{ request.GET.location }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Prix min</label>
+          <input type="number" name="prix_min" class="form-control" value="{{ request.GET.prix_min }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Prix max</label>
+          <input type="number" name="prix_max" class="form-control" value="{{ request.GET.prix_max }}">
+        </div>
+        <div class="mb-3">
+          <input type="checkbox" name="disponibilite" {% if request.GET.disponibilite %}checked{% endif %}>
+          <label>Disponible uniquement</label>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="row">
+      {% for property in properties %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          {% if property.image %}
+          <img src="{{ property.image.url }}" class="card-img-top" alt="{{ property.titre }}" style="height: 180px; object-fit: cover;">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ property.titre }}</h5>
+            {% if property.nom_reference_categorie %}
+            <p class="card-text small text-secondary mb-1">{{ property.nom_reference_categorie }}</p>
+            {% endif %}
+            <p class="card-text text-muted">{{ property.localisation }}</p>
+            <p class="card-text"><strong>{{ property.prix_jour }} MAD</strong> / jour</p>
+            {% if property.category %}
+            <span class="badge bg-secondary">{{ property.category.name }}</span>
+            {% endif %}
+            <a href="{% url 'property_detail' property.pk %}" class="btn btn-primary mt-2">Voir détails</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <p>Aucune annonce trouvée.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

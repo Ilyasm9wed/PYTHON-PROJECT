@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Créer{% endif %} une annonce{% endblock %}
+
+{% block content %}
+<h1>
+  {% if form_heading_staff %}Créer une annonce (administration)
+  {% elif form.instance.pk %}Modifier une annonce
+  {% else %}Créer une annonce{% endif %}
+</h1>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="mb-3">
+      <label class="form-label">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}
+      <small class="form-text text-muted">{{ field.help_text }}</small>
+      {% endif %}
+      {% if field.name == 'nom_reference_categorie' %}
+      <small id="nom-ref-hint-dynamique" class="text-muted d-block mt-1"></small>
+      {% endif %}
+      {% if field.errors %}
+        <div class="text-danger">{{ field.errors }}</div>
+      {% endif %}
+    </div>
+  {% endfor %}
+  <div class="mb-3">
+    <label class="form-label" for="gallery_images">Photos supplémentaires</label>
+    <input type="file" class="form-control" id="gallery_images" name="gallery_images" multiple accept="image/*">
+    <small class="text-muted">Vous pouvez sélectionner plusieurs images.</small>
+  </div>
+  <button type="submit" class="btn btn-primary">Enregistrer</button>
+  <a href="{% if cancel_url %}{{ cancel_url }}{% else %}{% url 'property_list' %}{% endif %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+{{ hints_par_categorie_json|json_script:"hints-par-categorie-data" }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var cat = document.getElementById('id_category');
+    var hintEl = document.getElementById('nom-ref-hint-dynamique');
+    if (!cat || !hintEl) return;
+    var dataEl = document.getElementById('hints-par-categorie-data');
+    var hints = {};
+    try {
+      hints = JSON.parse(dataEl.textContent);
+    } catch (e) {}
+    function updateHint() {
+      var v = cat.value;
+      hintEl.textContent = hints[v] || '';
+    }
+    cat.addEventListener('change', updateHint);
+    updateHint();
+  });
+</script>
+{% endblock %}

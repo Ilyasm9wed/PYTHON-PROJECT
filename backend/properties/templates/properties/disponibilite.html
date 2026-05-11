@@ -1,0 +1,124 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Disponibilités - {{ property.titre }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Gérer les disponibilités - {{ property.titre }}</h1>
+
+<div class="row">
+  <div class="col-md-8">
+    <div id="calendar"></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Ajouter une disponibilité</h5>
+      </div>
+      <div class="card-body">
+        <form id="disponibiliteForm" method="post" action="{% url 'disponibilite' property.pk %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Date début</label>
+            <input type="date" name="date_debut" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date fin</label>
+            <input type="date" name="date_fin" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <input type="checkbox" name="disponible" id="id_disponible" checked>
+            <label for="id_disponible">Disponible</label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+        </form>
+        <div id="dispoError" class="alert alert-danger mt-3 d-none" role="alert"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ events_json|json_script:"avail-events-data" }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var events = [];
+    var dataEl = document.getElementById('avail-events-data');
+    if (dataEl) {
+      try {
+        events = JSON.parse(dataEl.textContent);
+      } catch (e) {
+        console.error('Calendrier: JSON invalide', e);
+      }
+    }
+    if (typeof FullCalendar !== 'undefined' && calendarEl) {
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: events,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek'
+        }
+      });
+      calendar.render();
+    }
+
+    var form = document.getElementById('disponibiliteForm');
+    var errBox = document.getElementById('dispoError');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (errBox) {
+        errBox.classList.add('d-none');
+        errBox.textContent = '';
+      }
+
+      var formData = new FormData(form);
+      formData.set('disponible', formData.get('disponible') ? 'true' : 'false');
+
+      var tokenInput = form.querySelector('[name=csrfmiddlewaretoken]');
+      var headers = {};
+      if (tokenInput) {
+        headers['X-CSRFToken'] = tokenInput.value;
+      }
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: headers,
+        credentials: 'same-origin'
+      })
+      .then(function(response) {
+        return response.json().then(function(data) {
+          return { ok: response.ok, status: response.status, data: data };
+        });
+      })
+      .then(function(result) {
+        if (result.ok && result.data.success) {
+          window.location.reload();
+          return;
+        }
+        var msg = (result.data && result.data.error) ? result.data.error : 'Erreur (' + result.status + ').';
+        if (errBox) {
+          errBox.textContent = msg;
+          errBox.classList.remove('d-none');
+        } else {
+          alert(msg);
+        }
+      })
+      .catch(function() {
+        var msg = 'Erreur réseau ou serveur.';
+        if (errBox) {
+          errBox.textContent = msg;
+          errBox.classList.remove('d-none');
+        } else {
+          alert(msg);
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

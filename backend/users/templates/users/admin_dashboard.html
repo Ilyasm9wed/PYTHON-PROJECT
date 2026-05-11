@@ -1,0 +1,200 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Tableau de bord administrateur{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="fa-solid fa-gauge-high"></i> Tableau de bord administrateur</h1>
+<p class="mb-4 d-flex flex-wrap gap-2">
+  <a href="{% url 'staff_reservations' %}" class="btn btn-outline-primary btn-sm position-relative">
+    <i class="fa-solid fa-calendar-days"></i> Réservations
+    {% if stats.pending_user_reservations %}
+    <span class="badge bg-danger ms-1">{{ stats.pending_user_reservations }}</span>
+    {% endif %}
+  </a>
+  <a href="{% url 'staff_property_create' %}" class="btn btn-outline-primary btn-sm">
+    <i class="fa-solid fa-circle-plus"></i> Nouvelle annonce
+  </a>
+  <a href="{% url 'staff_export_reservations' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="fa-solid fa-file-csv"></i> Export CSV réservations
+  </a>
+  <a href="{% url 'staff_export_paiements' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="fa-solid fa-file-csv"></i> Export CSV paiements
+  </a>
+  <a href="{% url 'staff_audit_log' %}" class="btn btn-outline-dark btn-sm">
+    <i class="fa-solid fa-list"></i> Journal d’audit
+  </a>
+</p>
+<p class="text-muted small mb-4">
+  Clôture automatique des réservations : <code>python manage.py complete_past_reservations</code> (à planifier en cron).
+</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.users }}</h3>
+        <small class="text-muted">Utilisateurs</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.properties }}</h3>
+        <small class="text-muted">Annonces</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.reservations }}</h3>
+        <small class="text-muted">Réservations</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.paiements }}</h3>
+        <small class="text-muted">Paiements</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100 border-danger">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.pending_user_reservations }}</h3>
+        <small class="text-muted">Demandes utilisateur en attente</small>
+        <div class="mt-2">
+          <a href="{% url 'staff_reservations' %}" class="btn btn-sm btn-outline-danger">Traiter</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100 border-warning">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.signalements_pending }}</h3>
+        <small class="text-muted">Signalements à traiter</small>
+        <div class="mt-2">
+          <a href="{% url 'admin_signalements' %}" class="btn btn-sm btn-outline-warning">Modérer</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.signalements_total }}</h3>
+        <small class="text-muted">Signalements (total)</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.avis }}</h3>
+        <small class="text-muted">Avis</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-0">{{ stats.conversations }}</h3>
+        <small class="text-muted">Conversations</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><strong>Réservations créées par mois (12 mois)</strong></div>
+      <div class="card-body">
+        <canvas id="chartReservations" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><strong>Chiffre d’affaires (paiements complétés) par mois</strong></div>
+      <div class="card-body">
+        <canvas id="chartRevenue" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header"><strong>Réservations par statut</strong></div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Statut</th><th class="text-end">Nombre</th></tr></thead>
+          <tbody>
+            {% for row in reservations_par_statut %}
+            <tr>
+              <td><code>{{ row.statut }}</code></td>
+              <td class="text-end">{{ row.total }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">Aucune donnée.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header"><strong>Liens rapides Django Admin</strong></div>
+      <div class="card-body">
+        <ul class="list-unstyled mb-0">
+          {% for label, url in admin_links %}
+          <li class="mb-2"><a href="{{ url }}">{{ label }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ reservations_chart_json|json_script:"chart-reservations-data" }}
+{{ revenue_chart_json|json_script:"chart-revenue-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var resData = JSON.parse(document.getElementById('chart-reservations-data').textContent);
+    var revData = JSON.parse(document.getElementById('chart-revenue-data').textContent);
+    var labelsRes = resData.map(function(r) { return r.month; });
+    var countsRes = resData.map(function(r) { return r.count; });
+    var labelsRev = revData.map(function(r) { return r.month; });
+    var totalsRev = revData.map(function(r) { return r.total; });
+
+    if (typeof Chart !== 'undefined') {
+      new Chart(document.getElementById('chartReservations'), {
+        type: 'bar',
+        data: {
+          labels: labelsRes,
+          datasets: [{ label: 'Réservations', data: countsRes, backgroundColor: 'rgba(13, 110, 253, 0.6)' }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+      });
+      new Chart(document.getElementById('chartRevenue'), {
+        type: 'line',
+        data: {
+          labels: labelsRev,
+          datasets: [{ label: 'MAD', data: totalsRev, borderColor: 'rgb(25, 135, 84)', tension: 0.2 }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      });
+    }
+  });
+</script>
+{% endblock %}

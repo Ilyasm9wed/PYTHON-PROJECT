@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Contrat de location{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px;">
+  <div class="card">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">Contrat de location simplifié</h2>
+      <span>Réf: {{ reservation.contrat_reference }}</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Date de création:</strong> {{ reservation.created_at|date:"d/m/Y H:i" }}</p>
+      <p><strong>Statut de réservation:</strong> {{ reservation.get_statut_display }}</p>
+
+      <hr>
+
+      <h5>Parties</h5>
+      <p><strong>Locataire:</strong> {{ reservation.utilisateur.username }} ({{ reservation.utilisateur.email }})</p>
+      <p><strong>Propriétaire:</strong> {{ reservation.objet.proprietaire.username }} ({{ reservation.objet.proprietaire.email }})</p>
+
+      <h5 class="mt-4">Objet loué</h5>
+      <p><strong>Objet:</strong> {{ reservation.objet.titre }}</p>
+      <p><strong>Localisation:</strong> {{ reservation.objet.localisation }}</p>
+      <p><strong>Période:</strong> du {{ reservation.date_debut }} au {{ reservation.date_fin }}</p>
+      <p><strong>Durée:</strong> {{ reservation.calculer_duree }} jours</p>
+
+      <h5 class="mt-4">Conditions financières</h5>
+      <p><strong>Montant location:</strong> {{ reservation.calculer_montant_total }} MAD</p>
+      <p><strong>Caution:</strong> {{ reservation.objet.caution }} MAD</p>
+
+      <h5 class="mt-4">Clauses simplifiées</h5>
+      <ul>
+        <li>Le locataire utilise l'objet de manière responsable et conforme à sa destination.</li>
+        <li>Tout dommage causé pendant la période de location peut entraîner une retenue sur la caution.</li>
+        <li>Le propriétaire garantit que l'objet est disponible et en état de fonctionnement au début de la location.</li>
+        <li>Toute annulation suit les règles de statut de réservation de la plateforme.</li>
+      </ul>
+
+      <h5 class="mt-4">Validation du contrat</h5>
+      <p>
+        <strong>Acceptation locataire:</strong>
+        {% if reservation.contrat_accepte %}
+          <span class="badge bg-success">Oui</span>
+        {% else %}
+          <span class="badge bg-danger">Non</span>
+        {% endif %}
+      </p>
+      <p>
+        <strong>Confirmation propriétaire:</strong>
+        {% if reservation.contrat_proprietaire_confirme %}
+          <span class="badge bg-success">Oui</span>
+          {% if reservation.contrat_date_confirmation %}
+            <span class="text-muted ms-2">({{ reservation.contrat_date_confirmation|date:"d/m/Y H:i" }})</span>
+          {% endif %}
+        {% else %}
+          <span class="badge bg-warning text-dark">En attente</span>
+        {% endif %}
+      </p>
+
+      <div class="mt-4">
+        <button onclick="window.print()" class="btn btn-primary">Imprimer le contrat</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

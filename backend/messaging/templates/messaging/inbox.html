@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Boîte de réception</h1>
+
+<div class="list-group">
+  {% for conversation in conversations %}
+  <a href="{% url 'conversation' conversation.pk %}" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">
+        {% if conversation.property %}
+        {{ conversation.property.titre }}
+        {% else %}
+        Conversation #{{ conversation.id }}
+        {% endif %}
+      </h5>
+      <small>{{ conversation.created_at|date:"d/m/Y" }}</small>
+    </div>
+    <p class="mb-1">
+      {% for participant in conversation.participants.all %}
+        {% if participant != user %}
+          {{ participant.username }}
+        {% endif %}
+      {% endfor %}
+    </p>
+  </a>
+  {% empty %}
+  <div class="list-group-item">
+    Aucune conversation.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

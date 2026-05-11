@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Modifier le profil{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Modifier le profil</h1>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5>Informations personnelles</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger">{{ field.errors }}</div>
+              {% endif %}
+              {% if field.name == 'identity_document' %}
+                <small class="form-text text-muted">Téléchargez votre pièce d'identité pour vérification</small>
+                {% if user.identity_document %}
+                <br><a href="{{ user.identity_document.url }}" target="_blank">Voir le document actuel</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <a href="{% url 'profile' %}" class="btn btn-secondary">Annuler</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

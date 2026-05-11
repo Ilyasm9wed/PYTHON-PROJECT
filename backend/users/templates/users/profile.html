@@ -1,0 +1,86 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Mon profil</h1>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        {% if user_profile.avatar %}
+        <img src="{{ user_profile.avatar.url }}" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+        {% endif %}
+        <h3>{{ user_profile.username }}</h3>
+        <p>{{ user_profile.email }}</p>
+        <p>Note moyenne: {{ user_profile.note_moyenne }}/5</p>
+        <p>
+          {% if user_profile.identity_verified %}
+          <span class="badge bg-success">Identité vérifiée</span>
+          {% elif user_profile.identity_document_submitted %}
+          <span class="badge bg-warning">Vérification en cours</span>
+          {% else %}
+          <span class="badge bg-secondary">Identité non vérifiée</span>
+          {% endif %}
+        </p>
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Modifier le profil</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <h5>Mes annonces</h5>
+          </div>
+          <div class="card-body">
+            <p>{{ objets.count }} annonce(s)</p>
+            <a href="{% url 'my_properties' %}" class="btn btn-sm btn-primary">Voir</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <h5>Mes réservations</h5>
+          </div>
+          <div class="card-body">
+            <p>{{ reservations.count }} réservation(s)</p>
+            <a href="{% url 'my_reservations' %}" class="btn btn-sm btn-primary">Voir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h5>Avis reçus</h5>
+      </div>
+      <div class="card-body">
+        {% for avis in avis_recus %}
+        <div class="mb-3 pb-3 border-bottom">
+          <p><strong>{{ avis.auteur.username }}</strong> - {{ avis.note }}/5</p>
+          <p>{{ avis.commentaire }}</p>
+          <small class="text-muted">{{ avis.created_at|date:"d/m/Y" }}</small>
+        </div>
+        {% empty %}
+        <p>Aucun avis pour le moment.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5>Statistiques de fiabilité</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Locataire:</strong> {{ fiabilite_stats.total_as_tenant }} réservation(s)</p>
+        <p><strong>Taux d'annulation (locataire):</strong> {{ fiabilite_stats.cancel_rate_tenant }}%</p>
+        <p><strong>Propriétaire:</strong> {{ fiabilite_stats.total_as_owner }} demande(s) reçue(s)</p>
+        <p><strong>Taux d'acceptation (propriétaire):</strong> {{ fiabilite_stats.accept_rate_owner }}%</p>
+        <p><strong>Locations terminées (propriétaire):</strong> {{ fiabilite_stats.completed_as_owner }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

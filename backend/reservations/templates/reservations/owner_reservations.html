@@ -1,0 +1,63 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Réservations reçues{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Réservations reçues</h1>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Objet</th>
+        <th>Dates</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reservation in reservations %}
+      <tr>
+        <td>{{ reservation.utilisateur.username }}</td>
+        <td>{{ reservation.objet.titre }}</td>
+        <td>{{ reservation.date_debut }} au {{ reservation.date_fin }}</td>
+        <td>
+          {% if reservation.statut == 'pending' %}
+          <span class="badge bg-warning">En attente</span>
+          {% elif reservation.statut == 'accepted' %}
+          <span class="badge bg-success">Acceptée</span>
+          {% elif reservation.statut == 'refused' %}
+          <span class="badge bg-danger">Refusée</span>
+          {% elif reservation.statut == 'cancelled' %}
+          <span class="badge bg-secondary">Annulée</span>
+          {% elif reservation.statut == 'completed' %}
+          <span class="badge bg-info">Terminée</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'contrat_reservation' reservation.pk %}" class="btn btn-sm btn-outline-dark">Contrat</a>
+          {% if reservation.statut == 'completed' %}
+          <a href="{% url 'create_avis' reservation.pk %}" class="btn btn-sm btn-success">Noter le locataire</a>
+          {% endif %}
+          {% if reservation.statut == 'pending' %}
+          <form method="post" action="{% url 'accept_reservation' reservation.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-success">Accepter</button>
+          </form>
+          <form method="post" action="{% url 'refuse_reservation' reservation.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">Refuser</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">Aucune réservation reçue.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

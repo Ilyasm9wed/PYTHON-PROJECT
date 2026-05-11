@@ -1,0 +1,43 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Mes annonces - Location Entre Particuliers{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Mes annonces</h1>
+
+<div class="mb-3">
+  <a href="{% url 'property_create' %}" class="btn btn-primary">Publier une annonce</a>
+</div>
+
+<div class="row">
+  {% for property in properties %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100">
+      {% if property.image %}
+      <img src="{{ property.image.url }}" class="card-img-top" alt="{{ property.titre }}" style="height: 180px; object-fit: cover;">
+      {% endif %}
+      <div class="card-body">
+        <h5 class="card-title">{{ property.titre }}</h5>
+        {% if property.nom_reference_categorie %}
+        <p class="card-text small text-secondary">{{ property.nom_reference_categorie }}</p>
+        {% endif %}
+        <p class="card-text">{{ property.prix_jour }} MAD / jour</p>
+        <p class="card-text">
+          {% if property.disponibilite %}
+          <span class="badge bg-success">Disponible</span>
+          {% else %}
+          <span class="badge bg-danger">Indisponible</span>
+          {% endif %}
+        </p>
+        <a href="{% url 'property_detail' property.pk %}" class="btn btn-primary">Voir</a>
+        <a href="{% url 'property_update' property.pk %}" class="btn btn-warning">Modifier</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <p>Vous n'avez pas encore d'annonces.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

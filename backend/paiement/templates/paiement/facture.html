@@ -1,0 +1,68 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Facture{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2>FACTURE</h2>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <h5>LocaParticuliers</h5>
+          <p>Plateforme de location entre particuliers</p>
+        </div>
+        <div class="col-md-6 text-end">
+          <p><strong>Numéro de facture:</strong> {{ reservation.paiement.numero_facture }}</p>
+          <p><strong>Date:</strong> {{ reservation.paiement.created_at|date:"d/m/Y" }}</p>
+        </div>
+      </div>
+      
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <h5>Facturé à:</h5>
+          <p>{{ reservation.utilisateur.username }}</p>
+          <p>{{ reservation.utilisateur.email }}</p>
+          <p>{{ reservation.utilisateur.address|default:"" }}</p>
+        </div>
+        <div class="col-md-6">
+          <h5>Objet loué:</h5>
+          <p>{{ reservation.objet.titre }}</p>
+          <p>Propriétaire: {{ reservation.objet.proprietaire.username }}</p>
+        </div>
+      </div>
+      
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="text-end">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Location de {{ reservation.calculer_duree }} jours ({{ reservation.date_debut }} au {{ reservation.date_fin }})</td>
+            <td class="text-end">{{ reservation.paiement.montant }} MAD</td>
+          </tr>
+          <tr>
+            <td>Caution</td>
+            <td class="text-end">{{ reservation.paiement.caution }} MAD</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>Total</th>
+            <th class="text-end">{{ reservation.paiement.montant|add:reservation.paiement.caution }} MAD</th>
+          </tr>
+        </tfoot>
+      </table>
+      
+      <div class="mt-4">
+        <button onclick="window.print()" class="btn btn-primary">Imprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Contacter le propriétaire — {{ property.titre }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Envoyer un message</h1>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">{{ property.titre }}</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">
+          Propriétaire : <strong>{{ property.proprietaire.username }}</strong>
+        </p>
+        <form method="post" action="{% url 'send_message' property.id %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="id_contenu">Votre message</label>
+            <textarea id="id_contenu" name="contenu" class="form-control" rows="5" placeholder="Écrivez votre message..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Envoyer</button>
+          <a href="{% url 'property_detail' property.id %}" class="btn btn-secondary">Annuler</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

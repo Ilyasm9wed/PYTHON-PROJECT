@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Mes réservations{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+  <h1 class="mb-4 display-6 fw-bold text-gradient">Mes réservations</h1>
+
+  {% if recent_notifications %}
+  <div class="mb-4">
+    {% for n in recent_notifications %}
+    <div class="alert alert-{% if n.kind == 'reservation_refused' %}danger{% else %}success{% endif %} mb-2 py-3 shadow-sm border-0" role="alert" style="background: rgba({% if n.kind == 'reservation_refused' %}220,53,69{% else %}25,135,84{% endif %}, 0.1) !important; border-left: 4px solid var(--bs-{% if n.kind == 'reservation_refused' %}danger{% else %}success{% endif %}) !important;">
+      <i class="fa-solid fa-{% if n.kind == 'reservation_refused' %}circle-exclamation{% else %}circle-check{% endif %} me-2"></i> {{ n.message }}
+      <small class="d-block text-secondary mt-1">{{ n.created_at|date:'d/m/Y H:i' }}</small>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card glass-card border-0 p-4" style="background: rgba(10, 15, 30, 0.7) !important;">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0 text-white" style="background: transparent !important; --bs-table-bg: transparent; --bs-table-color: #fff;">
+        <thead style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+          <tr>
+            <th class="text-uppercase text-secondary small fw-bold pb-3 bg-transparent text-white border-0">Objet</th>
+            <th class="text-uppercase text-secondary small fw-bold pb-3 bg-transparent text-white border-0">Dates</th>
+            <th class="text-uppercase text-secondary small fw-bold pb-3 bg-transparent text-white border-0">Statut</th>
+            <th class="text-uppercase text-secondary small fw-bold pb-3 bg-transparent text-white border-0 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody style="border-top: none;">
+          {% for reservation in reservations %}
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: transparent;">
+            <td class="py-4 bg-transparent text-white border-0">
+              <span class="fw-bold">{{ reservation.objet.titre }}</span>
+            </td>
+            <td class="py-4 bg-transparent text-light border-0">
+              <i class="fa-regular fa-calendar text-secondary me-1"></i> {{ reservation.date_debut }} au {{ reservation.date_fin }}
+            </td>
+            <td class="py-4 bg-transparent border-0">
+              {% if reservation.statut == 'pending' %}
+              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">En attente</span>
+              {% elif reservation.statut == 'accepted' %}
+              <span class="badge bg-success px-3 py-2 rounded-pill">Acceptée</span>
+              {% elif reservation.statut == 'refused' %}
+              <span class="badge bg-danger px-3 py-2 rounded-pill">Refusée</span>
+              {% elif reservation.statut == 'cancelled' %}
+              <span class="badge bg-secondary px-3 py-2 rounded-pill">Annulée</span>
+              {% elif reservation.statut == 'completed' %}
+              <span class="badge bg-info text-dark px-3 py-2 rounded-pill">Terminée</span>
+              {% endif %}
+            </td>
+            <td class="py-4 bg-transparent border-0 text-end">
+              <div class="d-flex gap-2 justify-content-end flex-wrap">
+                <a href="{% url 'contrat_reservation' reservation.pk %}" class="btn btn-sm btn-secondary rounded-pill px-3 text-white">Contrat</a>
+                {% if reservation.statut == 'pending' or reservation.statut == 'accepted' %}
+                <a href="{% url 'edit_reservation' reservation.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Modifier</a>
+                {% endif %}
+                {% if reservation.statut == 'pending' %}
+                <form method="post" action="{% url 'cancel_reservation' reservation.pk %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Annuler</button>
+                </form>
+                {% endif %}
+                {% if reservation.statut == 'accepted' and not reservation.paiement %}
+                <a href="{% url 'pay_reservation' reservation.pk %}" class="btn btn-sm btn-primary rounded-pill px-3">Payer</a>
+                {% endif %}
+                {% if reservation.paiement %}
+                <a href="{% url 'facture' reservation.pk %}" class="btn btn-sm btn-info rounded-pill px-3 text-white">Facture</a>
+                {% endif %}
+                {% if reservation.statut == 'completed' %}
+                <a href="{% url 'create_avis' reservation.pk %}" class="btn btn-sm btn-success rounded-pill px-3 text-white">Noter</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center py-5 bg-transparent border-0">
+              <div class="text-secondary mb-3"><i class="fa-regular fa-calendar-xmark fs-1"></i></div>
+              <p class="mb-0 text-white">Aucune réservation pour le moment.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

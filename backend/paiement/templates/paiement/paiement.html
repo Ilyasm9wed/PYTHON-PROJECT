@@ -1,0 +1,62 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Paiement{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Paiement</h1>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5>Informations de paiement</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nom sur la carte</label>
+            <input type="text" name="nom_carte" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Numéro de carte</label>
+            <input type="text" name="numero_carte" class="form-control" maxlength="16" required>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Expiration</label>
+                <input type="text" name="expiration" class="form-control" placeholder="MM/YY" maxlength="5" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">CVV</label>
+                <input type="text" name="cvv" class="form-control" maxlength="3" required>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Payer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Récapitulatif</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Objet:</strong> {{ reservation.objet.titre }}</p>
+        <p><strong>Dates:</strong> {{ reservation.date_debut }} au {{ reservation.date_fin }}</p>
+        <p><strong>Durée:</strong> {{ reservation.calculer_duree }} jours</p>
+        <hr>
+        <p><strong>Montant:</strong> {{ total }} MAD</p>
+        <p><strong>Caution:</strong> {{ caution }} MAD</p>
+        <hr>
+        <p><strong>Total:</strong> {{ total|add:caution }} MAD</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

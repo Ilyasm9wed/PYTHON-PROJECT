@@ -1,0 +1,77 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ property.titre }} - Location Entre Particuliers{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    {% if property.image %}
+    <img src="{{ property.image.url }}" class="img-fluid mb-3 rounded" alt="{{ property.titre }}">
+    {% endif %}
+    {% if images %}
+    <div class="row g-2 mb-3">
+      {% for image in images %}
+      <div class="col-6 col-md-4">
+        <img src="{{ image.image.url }}" class="img-fluid rounded" alt="Photo de {{ property.titre }}">
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <h1>{{ property.titre }}</h1>
+    {% if property.nom_reference_categorie %}
+    <p class="lead text-secondary mb-2">{{ property.nom_reference_categorie }}</p>
+    {% endif %}
+    <p class="text-muted">{{ property.localisation }}</p>
+    <p>{{ property.description }}</p>
+    
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <h4>Tarifs</h4>
+        <p>{{ property.prix_jour }} MAD / jour</p>
+        {% if property.prix_semaine %}
+        <p>{{ property.prix_semaine }} MAD / semaine</p>
+        {% endif %}
+        {% if property.prix_mois %}
+        <p>{{ property.prix_mois }} MAD / mois</p>
+        {% endif %}
+        <p>Caution: {{ property.caution }} MAD</p>
+      </div>
+      <div class="col-md-6">
+        <h4>Informations</h4>
+        <p>Propriétaire: {{ property.proprietaire.username }}</p>
+        <p>Vues: {{ property.views_count }}</p>
+        {% if property.category %}
+        <p>Catégorie: {{ property.category.name }}</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    {% if not user.is_authenticated or user != property.proprietaire %}
+    <div class="mt-4">
+      {% if not user.is_authenticated %}
+      <p class="mb-3"><a href="{% url 'login' %}" class="btn btn-primary">Se connecter pour réserver</a></p>
+      {% endif %}
+      <a href="{% url 'create_reservation' property.id %}" class="btn btn-primary">Réserver</a>
+      <a href="{% url 'send_message' property.id %}" class="btn btn-secondary">Contacter</a>
+      <a href="{% url 'signalement' property.id %}" class="btn btn-outline-danger">Signaler</a>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Actions</h5>
+      </div>
+      <div class="card-body">
+        {% if user.is_authenticated and user == property.proprietaire %}
+        <a href="{% url 'property_update' property.pk %}" class="btn btn-warning w-100 mb-2">Modifier</a>
+        <a href="{% url 'property_delete' property.pk %}" class="btn btn-danger w-100 mb-2">Supprimer</a>
+        <a href="{% url 'disponibilite' property.pk %}" class="btn btn-info w-100">Gérer disponibilités</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
