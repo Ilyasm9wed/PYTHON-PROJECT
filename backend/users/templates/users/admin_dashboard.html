@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base/admin_base.html' %}
 
 {% block title %}Tableau de bord administrateur{% endblock %}
 
@@ -23,9 +23,6 @@
   <a href="{% url 'staff_audit_log' %}" class="btn btn-outline-dark btn-sm">
     <i class="fa-solid fa-list"></i> Journal d’audit
   </a>
-</p>
-<p class="text-muted small mb-4">
-  Clôture automatique des réservations : <code>python manage.py complete_past_reservations</code> (à planifier en cron).
 </p>
 
 <div class="row g-3 mb-4">

@@ -25,6 +25,12 @@ class CreateReservationView(LoginRequiredMixin, View):
         message_locataire = request.POST.get('message_locataire')
         contrat_accepte = request.POST.get('contrat_accepte') == 'on'
         
+        if not property_obj.disponibilite:
+            messages.error(request, 'Cette annonce n\'est pas disponible pour la réservation.')
+            return render(request, 'reservations/create_reservation.html', {
+                'property': property_obj,
+            })
+        
         if not contrat_accepte:
             messages.error(request, 'Vous devez accepter le contrat de location.')
             return render(request, 'reservations/create_reservation.html', {

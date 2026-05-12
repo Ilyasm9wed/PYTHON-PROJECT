@@ -152,6 +152,33 @@ class DisponibiliteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         property_obj = get_object_or_404(Property, pk=pk)
         if property_obj.proprietaire != request.user:
+            return JsonResponse({'success': False, 'error': 'Non autorisé.'}, status=403)
+        
+        date_debut = request.POST.get('date_debut')
+        date_fin = request.POST.get('date_fin')
+        disponible = request.POST.get('disponible') == 'true'
+        
+        try:
+            date_debut = datetime.strptime(date_debut, '%Y-%m-%d').date()
+            date_fin = datetime.strptime(date_fin, '%Y-%m-%d').date()
+            
+            if date_fin <= date_debut:
+                return JsonResponse({'success': False, 'error': 'La date de fin doit être après la date de début.'})
+            
+            Disponibilite.objects.create(
+                property=property_obj,
+                date_debut=date_debut,
+                date_fin=date_fin,
+                disponible=disponible,
+            )
+            
+            return JsonResponse({'success': True, 'message': 'Disponibilité ajoutée avec succès.'})
+        except (ValueError, TypeError) as e:
+            return JsonResponse({'success': False, 'error': 'Dates invalides.'})
+    
+    def post(self, request, pk):
+        property_obj = get_object_or_404(Property, pk=pk)
+        if property_obj.proprietaire != request.user:
             return JsonResponse({'error': 'Unauthorized'}, status=403)
         
         date_debut = request.POST.get('date_debut')

@@ -395,7 +395,7 @@ class StaffPropertyCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView
 
     model = Property
     form_class = StaffPropertyForm
-    template_name = 'properties/property_form.html'
+    template_name = 'properties/staff_property_form.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

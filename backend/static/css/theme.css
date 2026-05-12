@@ -13,6 +13,11 @@ body {
   color: #ffffff !important;
   font-family: 'Inter', sans-serif !important;
   overflow-x: hidden;
+  padding-top: 0;
+}
+
+main {
+  padding-top: 70px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -100,25 +105,74 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(5, 8, 16, 0.8) !important;
   backdrop-filter: blur(20px) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  padding: 1rem 0 !important;
+  padding: 0.4rem 0 !important;
+  height: auto;
+  z-index: 1000;
+  min-height: auto;
 }
 .navbar-brand {
   color: #fff !important;
   font-family: 'Poppins', sans-serif !important;
   font-weight: bold;
+  white-space: nowrap;
+  font-size: 1rem;
+  padding: 0.25rem 0 !important;
+  margin: 0 !important;
 }
 .navbar-brand span {
   background: linear-gradient(to right, var(--neon-purple), var(--neon-blue));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.navbar-brand > div {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 0.75rem !important;
+}
+.navbar-toggler {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 0.25rem 0.5rem !important;
+}
+.navbar-toggler:focus {
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5) !important;
+}
+.navbar-nav {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
 .nav-link {
   color: #cbd5e1 !important;
   transition: color 0.3s ease;
   font-weight: 500;
+  padding: 0.35rem 0.5rem !important;
+  white-space: nowrap;
+  font-size: 0.85rem !important;
+  margin: 0 !important;
 }
 .nav-link:hover {
   color: var(--neon-indigo) !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background: rgba(5, 8, 16, 0.95) !important;
+    margin-top: 0.3rem;
+    padding: 0.75rem 0.5rem;
+    border-radius: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  
+  .navbar-nav {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 
 /* Texts & Links */

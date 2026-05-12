@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 # Si vide et DEBUG=True, une valeur de développement est utilisée (à changer).
 _admin_signup = os.environ.get('ADMIN_SIGNUP_SECRET', '')
 ADMIN_SIGNUP_SECRET = _admin_signup or ('dev-admin-locaparticuliers' if DEBUG else '')
-
+    
 
 # Application definition
 
